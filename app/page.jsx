@@ -1,10 +1,19 @@
 import { Bell, Divide, LogIn, Rabbit, Shield } from "lucide-react";
 import Image from "next/image";
 import Logo from "../public/logo.png";
-import { Button } from "@/components/ui/button";
-import AddProductForm from "@/components/ui/AddProductForm";
-export default function Home() {
-  const user = null;
+import AddProductForm from "@/components/AddProductForm";
+import AuthButton from "@/components/AuthButton";
+import { createClient } from "@/utils/supabase/server";
+
+export default async function Home() {
+  const supabase = await createClient();
+
+  console.log("supabase:", supabase);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const product = null;
   const FEATURES = [
     {
@@ -39,14 +48,10 @@ export default function Home() {
               className="h-14 sm:h-16 md:h-18 w-auto"
             />
           </div>
-          {/* auth button  */}
-          <Button
-            variant="default"
-            className="  bg-orange-400 hover:bg-orange-600 font-semibold"
-          >
-            <LogIn />
-            Sign In
-          </Button>
+
+          {/* //*--------- auth button ------  */}
+
+          <AuthButton user={user} />
         </div>
       </header>
 
@@ -78,11 +83,12 @@ export default function Home() {
           {/* Add product form */}
           <AddProductForm user={user} />
           {/* features */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16 ">
             {FEATURES.map((item) => (
               <div
                 key={item.title}
-                className="bg-linear-to-br from-orange-200/20  to-gray-100/50 shadow-xl rounded-xl border border-gray-200 flex flex-col items-center px-4 py-8 mx-6 md:mx-0"
+                className="bg-linear-to-br from-orange-200/20 transition-all duration-300 hover:scale-[1.1]
+                 to-gray-100/50 shadow-xl rounded-xl border border-gray-200 flex flex-col items-center px-4 py-8 mx-6 md:mx-0"
               >
                 <div
                   className="w-12 h-12 bg-linear-to-br from-orange-300/80  to-gray-100 rounded-lg 
