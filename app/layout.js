@@ -1,6 +1,5 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { Toaster } from "sonner";
 
 export const metadata = {
   title: "Create Next App",
@@ -9,10 +8,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-   >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en">
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Toaster richColors />
+      </body>
     </html>
   );
 }

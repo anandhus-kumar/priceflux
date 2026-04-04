@@ -1,27 +1,20 @@
-import {
-  Bell,
-  Divide,
-  LogIn,
-  Rabbit,
-  Shield,
-  TrendingDown,
-} from "lucide-react";
+import { Bell, Rabbit, Shield, TrendingDown } from "lucide-react";
 import Image from "next/image";
 import Logo from "../public/logo.png";
 import AddProductForm from "@/components/AddProductForm";
 import AuthButton from "@/components/AuthButton";
 import { createClient } from "@/utils/supabase/server";
+import { getProducts } from "./auth/callback/actions";
+import ProductCard from "@/components/ProductCard";
 
 export default async function Home() {
   const supabase = await createClient();
-
-  console.log("supabase:", supabase);
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const product = [];
+  const product = user ? await getProducts() : [];
+
   const FEATURES = [
     {
       icon: Rabbit,
@@ -89,27 +82,47 @@ export default async function Home() {
 
           {/* Add product form */}
           <AddProductForm user={user} />
+
           {/* features */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16 ">
-            {FEATURES.map((item) => (
-              <div
-                key={item.title}
-                className="bg-linear-to-br from-orange-200/20 transition-all duration-300 hover:scale-[1.1]
-                 to-gray-100/50 shadow-xl rounded-xl border border-gray-200 flex flex-col items-center px-4 py-8 mx-6 md:mx-0"
-              >
+
+          {product.length === 0 && (
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16 ">
+              {FEATURES.map((item) => (
                 <div
-                  className="w-12 h-12 bg-linear-to-br from-orange-300/80  to-gray-100 rounded-lg 
-                flex items-center justify-center mb-4 "
+                  key={item.title}
+                  className="bg-linear-to-br from-orange-200/20 transition-all duration-300 hover:scale-[1.1]
+                 to-gray-100/50 shadow-xl rounded-xl border border-gray-200 flex flex-col items-center px-4 py-8 mx-6 md:mx-0"
                 >
-                  <item.icon className="w-6 h-6 text-orange-600" />
+                  <div
+                    className="w-12 h-12 bg-linear-to-br from-orange-300/80  to-gray-100 rounded-lg 
+                flex items-center justify-center mb-4 "
+                  >
+                    <item.icon className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p>{item.description}</p>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p>{item.description}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
+
+      {user && product.length > 0 && (
+        <section className="max-w-2xl mx-auto px-4 pb-20 ">
+          <div className="flex items-center justify-between mb-6">
+            <h3>Your Tracked Products</h3>
+            <span className="text-sm text-gray-500">
+              {product.length} {product.length === 1 ? "Product" : "Products"}
+            </span>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 items-start">
+            {product.map((prd) => (
+              <ProductCard key={prd.id} product={prd} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {user && product.length === 0 && (
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
