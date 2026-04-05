@@ -15,10 +15,12 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  Trash,
   TrendingDown,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import PriceChart from "./PriceChart";
 
 const ProductCard = ({ product }) => {
   const [showChart, setShowChart] = useState(false);
@@ -30,9 +32,9 @@ const ProductCard = ({ product }) => {
 
     const res = await deleteProduct(id);
     if (res.success) {
-      toast.success("Product deleted");
+      toast.success("Product removed");
     } else {
-      toast.error("error:Try after Sometime");
+      toast.error("Try after Sometimes");
     }
     setDeleting(false);
   }
@@ -82,7 +84,7 @@ const ProductCard = ({ product }) => {
               )}
             </Button>
 
-            <Button variant="outline" size="sm" aschild className="gap-1 ">
+            <Button variant="outline" size="sm" className="gap-1 ">
               <Link
                 href={product.url}
                 target="_blank"
@@ -93,9 +95,25 @@ const ProductCard = ({ product }) => {
                 </span>
               </Link>
             </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleDelete(product.id)}
+            >
+              <span className="flex items-center justify-center gap-1">
+                {" "}
+                <Trash className="w-4 h-4" /> Remove
+              </span>
+            </Button>
           </div>
         </CardContent>
-        <CardFooter className="flex-col gap-2"></CardFooter>
+        {showChart ? (
+          <CardFooter className="pt-0">
+            <PriceChart productId={product.id} />
+          </CardFooter>
+        ) : (
+          ""
+        )}
       </Card>
     </>
   );

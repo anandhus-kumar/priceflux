@@ -109,10 +109,10 @@ export default async function Home() {
       </section>
 
       {user && product.length > 0 && (
-        <section className="max-w-2xl mx-auto px-4 pb-20 ">
-          <div className="flex items-center justify-between mb-6">
-            <h3>Your Tracked Products</h3>
-            <span className="text-sm text-gray-500">
+        <section className="max-w-4xl mx-auto px-4 pb-20 ">
+          <div className="flex items-center justify-between mb-6 border-b pb-3">
+            <h3 className="sm:text-lg text-md">Your Tracked Products</h3>
+            <span className="sm:text-lg text-md text-gray-500">
               {product.length} {product.length === 1 ? "Product" : "Products"}
             </span>
           </div>
