@@ -1,3 +1,4 @@
+import { sendPriceDropAlert } from "@/lib/email";
 import { scrapeProduct } from "@/lib/firecrawl";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
@@ -7,10 +8,10 @@ export async function GET() {
     message: "price check endpoint",
   });
 }
-export async function POST() {
+export async function POST(request) {
   try {
     const authHeader = request.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
+    const cronSecret = process.env.CRON_SECRET_KEY;
 
     if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -47,7 +48,7 @@ export async function POST() {
         const newPrice = parseFloat(productData.currentPrice);
         const oldPrice = parseFloat(product.current_price);
 
-         await supabase
+        await supabase
           .from("products")
           .update({
             current_price: newPrice,
@@ -57,7 +58,8 @@ export async function POST() {
             updated_at: new Date().toISOString(),
           })
           .eq("id", product.id);
-           if (oldPrice !== newPrice) {
+
+        if (oldPrice !== newPrice) {
           await supabase.from("price_history").insert({
             product_id: product.id,
             price: newPrice,
@@ -76,7 +78,7 @@ export async function POST() {
                 user.email,
                 product,
                 oldPrice,
-                newPrice
+                newPrice,
               );
 
               if (emailResult.success) {
@@ -92,15 +94,14 @@ export async function POST() {
         result.failed++;
       }
     }
- return NextResponse.json({
+
+    return NextResponse.json({
       success: true,
       message: "Price check completed",
       result,
     });
-
-
   } catch (error) {
-     console.error("Cron job error:", error);
+    console.error("Cron job error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
